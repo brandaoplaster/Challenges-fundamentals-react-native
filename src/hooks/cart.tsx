@@ -34,12 +34,12 @@ const CartProvider: React.FC = ({ children }) => {
         '@GoMarktplace:products',
       );
       if (productsStorage) {
-        setProducts([...products, JSON.parse(productsStorage)]);
+        setProducts([...JSON.parse(productsStorage)]);
       }
     }
 
     loadProducts();
-  }, [products]);
+  }, []);
 
   const addToCart = useCallback(
     async product => {
@@ -72,6 +72,11 @@ const CartProvider: React.FC = ({ children }) => {
           : product,
       );
       setProducts(productUpdated);
+
+      await AsyncStorage.setItem(
+        '@GoMarktplace:products',
+        JSON.stringify(productUpdated),
+      );
     },
     [products],
   );
@@ -79,11 +84,16 @@ const CartProvider: React.FC = ({ children }) => {
   const decrement = useCallback(
     async id => {
       const productDescrement = products.map(product =>
-        product.id === id && product.quantity > 1
+        product.id === id && product.quantity >= 2
           ? { ...product, quantity: product.quantity - 1 }
           : product,
       );
       setProducts(productDescrement);
+
+      await AsyncStorage.setItem(
+        '@GoMarktplace:products',
+        JSON.stringify(productDescrement),
+      );
     },
     [products],
   );
